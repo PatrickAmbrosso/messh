@@ -1,0 +1,16 @@
+version: '3'
+
+vars:
+  BINARY_NAME: messh
+
+tasks:
+  default:
+    desc: Run the default task
+    cmds:
+      - task --list-all
+
+  build:
+    desc: Build the binary
+    cmds:
+      - go build -o {{.BINARY_NAME}}.exe ./src/main.go
+
