@@ -3,7 +3,7 @@ package helpers
 import (
 	"fmt"
 	mathRand "math/rand"
-	"messh/src/config"
+	"messh/src/constants"
 	"messh/src/models"
 	"os"
 	"os/exec"
@@ -34,8 +34,8 @@ func GenerateSSHKey(params *models.GenerateKeyParams) (*models.GeneratedKey, err
 
 	keyType := strings.ToLower(params.KeyType)
 
-	if keyType != "" && !slices.Contains(config.AllowedSSHKeyTypes, keyType) {
-		return nil, fmt.Errorf("key type %s is invalid - allowed types are: %s", keyType, strings.Join(config.AllowedSSHKeyTypes, ", "))
+	if keyType != "" && !slices.Contains(constants.AllowedSSHKeyTypes, keyType) {
+		return nil, fmt.Errorf("key type %s is invalid - allowed types are: %s", keyType, strings.Join(constants.AllowedSSHKeyTypes, ", "))
 	}
 
 	if keyType == "" {

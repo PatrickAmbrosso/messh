@@ -12,5 +12,5 @@ tasks:
   build:
     desc: Build the binary
     cmds:
-      - go build -o {{.BINARY_NAME}}.exe ./src/main.go
+      - go build -ldflags="-s -w" -o {{.BINARY_NAME}}.exe ./src/main.go
 

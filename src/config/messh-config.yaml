@@ -1,0 +1,32 @@
+# Template Variables:
+#   {{HOME}}        → User's home directory
+#   {{USERNAME}}    → User's username
+#   {{HOSTNAME}}    → System hostname
+#   {{ENV.VAR}}     → Environment variable
+
+# Supported key types: rsa, ed25519, ecdsa
+# Supported key sizes:
+#    2048, 3072, 4096 for rsa
+#    256, 384, 521 for ecdsa
+
+app-management:
+  log-level: debug
+
+keys-management:
+  keys-paths:
+    - path: "{{HOME}}/.ssh"
+      recursive: false
+    - path: "{{HOME}}/.ssh/keys"
+      recursive: true
+
+  defaults:
+    key-type: ed25519 # rsa, ed25519, ecdsa
+    key-size: # only for rsa/ecdsa
+    out-dir: "{{HOME}}/.ssh/keys"
+    comment: "{{USERNAME}}@{{HOSTNAME}}"
+    passphrase: "{{ENV.SSH_PASS}}"
+    expiry: "90 days"
+    force-overwrite: true
+    tags:
+      - messh
+      - ssh

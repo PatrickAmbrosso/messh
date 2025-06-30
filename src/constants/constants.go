@@ -1,11 +1,11 @@
-package config
+package constants
 
 // App branding configurations //////////////////////////
 
-const AppFullName = "Vignyan"
-const AppAbbrName = "vignyan"
+const AppFullName = "Messh"
+const AppAbbrName = "messh"
 const AppVersion = "0.0.1"
-const AppDescription = "Open reference library"
+const AppDescription = "Simple & Cross-platform SSH Connection Manager"
 const AppBanner = `
 █▄ ▄█ ██▀ ▄▀▀ ▄▀▀ █ █ │ SIMPLE, CROSS-PLATFORM
 █ ▀ █ █▄▄ ▄█▀ ▄█▀ █▀█ │ SSH CONNECTION MANAGER

@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"messh/src/config"
+	"messh/src/constants"
 	"messh/src/out"
 	"os"
 
@@ -10,9 +10,14 @@ import (
 )
 
 const (
-	helpRootCmd          = "A CLI tool to manage SSH connections from your terminal."
-	helpAddCmd           = "Add a new SSH connection."
-	helpRemoveCmd        = "Remove an SSH connection."
+	helpRootCmd   = "A CLI tool to manage SSH connections from your terminal."
+	helpAddCmd    = "Add a new SSH connection."
+	helpRemoveCmd = "Remove an SSH connection."
+
+	helpConfigCmd     = "Manage the configuration file."
+	helpConfigInitCmd = "Initialize the configuration file."
+	helpConfigShowCmd = "Show the current configuration."
+
 	helpEditCmd          = "Edit an SSH connection."
 	helpKeysCmd          = "Generate and manage SSH key pairs."
 	helpKeysGenerateCmd  = "Generate a new SSH key pair."
@@ -23,9 +28,20 @@ const (
 	helpFmtCmd           = "Format the SSH connections file."
 	helpSessionsCmd      = "List the SSH sessions."
 	helpSessionsPruneCmd = "Prune the SSH sessions."
+
+	helpConnCmd    = "Manage SSH connections."
+	helpHistoryCmd = "Show the SSH connection history."
+
+	helpDoctorCmd = "Run a diagnostic check."
 )
 
 var (
+	flagConfigInitFile           string
+	flagConfigInitConfirm        bool
+	flagConfigShowTemplate       bool
+	flagConfigShowExportFile     string
+	flagConfigShowExportConfirm  bool
+	flagConfigShowQuiet          bool
 	flagKeysGenerateKeyName      string
 	flagKeysGenerateKeyType      string
 	flagKeysGenerateKeySize      int
@@ -50,13 +66,16 @@ var (
 	flagKeysRemoveByMatchPattern string
 	flagKeysRemoveConfirm        bool
 	flagKeysPruneConfirm         bool
+
+	flagDoctorQuiet bool
+	flagDoctorFile  string
 )
 
 var rootCmd = &cobra.Command{
-	Use:           config.AppAbbrName,
+	Use:           constants.AppAbbrName,
 	Short:         helpRootCmd,
 	Long:          out.Banner(helpRootCmd),
-	Version:       config.AppVersion,
+	Version:       constants.AppVersion,
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PreRun: func(cmd *cobra.Command, args []string) {
@@ -73,7 +92,7 @@ func init() {
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
 		cmd.Help()
 		fmt.Println()
-		out.Error("Flag parse error", "error", err.Error())
+		out.SCLogger.Error("Flag parse error", "error", err.Error())
 		os.Exit(1)
 		return nil
 	})
@@ -83,8 +102,8 @@ func validateCLIArgsCount(n int, cmd *cobra.Command, args []string) {
 	if len(args) != n {
 		_ = cmd.Help()
 		fmt.Println()
-		out.Error(fmt.Sprintf("Command '%s' expects exactly %d argument(s).", cmd.CommandPath(), n))
-		out.Info(fmt.Sprintf("Run '%s --help' for usage.", cmd.CommandPath()))
+		out.SCLogger.Error(fmt.Sprintf("Command '%s' expects exactly %d argument(s).", cmd.CommandPath(), n))
+		out.SCLogger.Info(fmt.Sprintf("Run '%s --help' for usage.", cmd.CommandPath()))
 		os.Exit(1)
 	}
 }

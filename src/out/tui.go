@@ -1,68 +1,28 @@
 package out
 
 import (
-	"fmt"
-	"messh/src/config"
+	"messh/src/constants"
 	"strings"
 
-	"github.com/pterm/pterm"
+	"github.com/charmbracelet/lipgloss"
 )
 
 // ASCII Banner
 func Banner(message string) string {
-	var sb strings.Builder
-	sb.WriteString(pterm.Sprintf(config.AppBanner))
-	sb.WriteString("\n")
-	sb.WriteString(pterm.FgBlue.Sprint(message))
-	sb.WriteString("\n")
-	return sb.String()
-}
+	bannerStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("7")).
+		PaddingTop(1).
+		PaddingBottom(1)
 
-// Log Messages
-func Debug(msg string, args ...any) {
-	style := pterm.FgLightMagenta
-	logMessage(style, "[-]", msg, args...)
-}
+	helpStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("4"))
 
-func Info(msg string, args ...any) {
-	style := pterm.FgLightGreen
-	logMessage(style, "[i]", msg, args...)
-}
+	banner := bannerStyle.Render(strings.Trim(constants.AppBanner, "\n"))
 
-func Warn(msg string, args ...any) {
-	style := pterm.FgYellow
-	logMessage(style, "[!]", msg, args...)
-}
-
-func Error(msg string, args ...any) {
-	style := pterm.FgLightRed
-	logMessage(style, "[✗]", msg, args...)
-}
-
-func logMessage(color pterm.Color, icon, msg string, args ...any) {
-	var b strings.Builder
-
-	emphasisStyle := pterm.NewStyle(color, pterm.Bold)
-	messageStyle := pterm.NewStyle(pterm.FgLightWhite)
-
-	b.WriteString(emphasisStyle.Sprint(icon))
-	b.WriteString(" ")
-	b.WriteString(messageStyle.Sprint(msg))
-
-	// Key-value pairs
-	if len(args) > 0 {
-		b.WriteString("  ")
-		for i := 0; i < len(args); i += 2 {
-			var key any = ""
-			var val any = ""
-			key = args[i]
-			if i+1 < len(args) {
-				val = args[i+1]
-			}
-			// Color the key
-			b.WriteString(emphasisStyle.Sprint(fmt.Sprintf("%v", key)))
-			b.WriteString(messageStyle.Sprint(fmt.Sprintf("=%v ", val)))
-		}
+	if strings.TrimSpace(message) != "" {
+		helpBlock := helpStyle.Render(message)
+		return lipgloss.JoinVertical(lipgloss.Left, banner, helpBlock)
 	}
-	fmt.Println(b.String())
+
+	return banner
 }
