@@ -28,11 +28,27 @@ var defaultConfig []byte
 // Configuration Accessors ////////////////////////////////////////////////////
 
 // loads the active config (singleton) from default path or falls back to embedded config
-func GetConfig() (*models.Config, string, error) {
-	once.Do(func() {
-		cfg, cfgSrc, err = loadConfig("")
-	})
-	return cfg, cfgSrc, err
+func GetConfig(getTemplate bool) (*models.Config, string, error) {
+	if getTemplate {
+		return loadConfig("", true)
+	} else {
+		once.Do(func() {
+			cfg, cfgSrc, err = loadConfig("", false)
+		})
+		return cfg, cfgSrc, err
+	}
+}
+
+func GetDefaultConfig() (*models.Config, error) {
+	decoder := yaml.NewDecoder(strings.NewReader(string(defaultConfig)))
+	decoder.KnownFields(true)
+
+	var cfg models.Config
+	if err := decoder.Decode(&cfg); err != nil {
+		return nil, fmt.Errorf("error decoding YAML: %w", err)
+	}
+
+	return &cfg, nil
 }
 
 // loads a config from another file and saves it to the default path
@@ -79,7 +95,7 @@ func ExportConfig(path string, overwrite bool) (string, error) {
 		path = "config-export.yaml"
 	}
 
-	cfg, _, err := GetConfig()
+	cfg, _, err := GetConfig(false)
 	if err != nil {
 		return "", fmt.Errorf("failed to load config: %w", err)
 	}
@@ -109,7 +125,25 @@ func resolveConfigPath(configPath string) (string, error) {
 	return absConfigPath, nil
 }
 
-func loadConfig(configPath string) (*models.Config, string, error) {
+func loadConfig(configPath string, getTemplate bool) (*models.Config, string, error) {
+
+	marshallConfig := func(data []byte) (*models.Config, error) {
+		decoder := yaml.NewDecoder(strings.NewReader(string(data)))
+		decoder.KnownFields(true)
+		var cfg models.Config
+		if err := decoder.Decode(&cfg); err != nil {
+			return nil, fmt.Errorf("error decoding YAML: %w", err)
+		}
+		return &cfg, nil
+	}
+
+	if getTemplate {
+		cfg, err := marshallConfig(defaultConfig)
+		if err != nil {
+			return nil, "", err
+		}
+		return cfg, "config template", nil
+	}
 
 	isEmbedded := false
 
@@ -121,7 +155,6 @@ func loadConfig(configPath string) (*models.Config, string, error) {
 	var data []byte
 
 	if _, err := os.Stat(absConfigPath); os.IsNotExist(err) {
-		// fallback to embedded config
 		data = defaultConfig
 		isEmbedded = true
 	} else if err == nil {
@@ -139,15 +172,12 @@ func loadConfig(configPath string) (*models.Config, string, error) {
 		cfgSrc = absConfigPath
 	}
 
-	decoder := yaml.NewDecoder(strings.NewReader(string(data)))
-	decoder.KnownFields(true)
-
-	var cfg models.Config
-	if err := decoder.Decode(&cfg); err != nil {
-		return nil, "", fmt.Errorf("error decoding YAML: %w", err)
+	cfg, err := marshallConfig(data)
+	if err != nil {
+		return nil, "", err
 	}
 
-	return &cfg, cfgSrc, nil
+	return cfg, cfgSrc, nil
 }
 
 func saveConfig(cfg *models.Config, path string, overwrite bool) (string, error) {

@@ -26,3 +26,23 @@ func Banner(message string) string {
 
 	return banner
 }
+
+func SectionHeader(header string) string {
+	return lipgloss.NewStyle().
+		Foreground(lipgloss.Color("11")). // Bright yellow
+		Bold(true).
+		Padding(1, 0).
+		Render(header)
+}
+
+func KV(key, value string) string {
+	keyStyle := lipgloss.NewStyle().
+		PaddingLeft(2).
+		Bold(true).
+		Foreground(lipgloss.Color("11")) // Bright Yellow
+
+	valueStyle := lipgloss.NewStyle().
+		Foreground(lipgloss.Color("15")) // Bright White
+
+	return keyStyle.Render(key+":") + " " + valueStyle.Render(value)
+}

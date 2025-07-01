@@ -49,7 +49,7 @@ func getSimpleConsoleLoggerStyles() *log.Styles {
 // Main Functions ////////////////////////////////////////////////
 
 func init() {
-	cfg, _, err := config.GetConfig()
+	cfg, _, err := config.GetConfig(false)
 	if err != nil {
 		fmt.Println("failed to load config:", err)
 	}
@@ -77,6 +77,7 @@ func NewLogger(opts ...LoggerOptions) (*log.Logger, error) {
 	if !options.LogToFile {
 		return log.NewWithOptions(os.Stderr, log.Options{
 			ReportTimestamp: true,
+			TimeFormat:      "2006-01-02 15:04:05",
 			Level:           getLogLevel(options.Level),
 			Formatter:       log.TextFormatter,
 		}), nil
@@ -119,9 +120,9 @@ func NewLogger(opts ...LoggerOptions) (*log.Logger, error) {
 
 	// Create the logger & return it
 	return log.NewWithOptions(file, log.Options{
+		ReportTimestamp: true,
 		TimeFormat:      "2006-01-02 15:04:05",
 		Level:           getLogLevel(options.Level),
-		ReportTimestamp: true,
 		Formatter:       log.TextFormatter,
 	}), nil
 

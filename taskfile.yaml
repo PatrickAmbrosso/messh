@@ -14,3 +14,8 @@ tasks:
     cmds:
       - go build -ldflags="-s -w" -o {{.BINARY_NAME}}.exe ./src/main.go
 
+  tidy:
+    desc: Tidy the project
+    cmds:
+      - go mod tidy
+      - go mod verify
